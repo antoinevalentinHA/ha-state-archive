@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local configuration
+.env
+.env.*
+!.env.example
+*.local.yaml
+*.local.yml
+*.local.json
+
+# Secrets
+secrets.yaml
+secrets.yml
+*.secret
+*.key
+*.pem
+*.crt
+
+# Runtime data
+versions/
+_quarantine/
+_diff/
+_audit/
+_reports/
+exports/
+logs/
+tmp/
+cache/
+
+# Generated reports
+*.log
+*_latest.md
+latest.verdict.json
+processed_backups.json
+last_processed_version.txt
+
+# Home Assistant sensitive/runtime files
+.storage/
+home-assistant_v2.db*
+*.tar
+*.tar.gz
+*.backup
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
