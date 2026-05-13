@@ -33,6 +33,7 @@ classifiers = [
 
 dependencies = [
     "PyYAML>=6.0"
+	"paho-mqtt>=2.1.0"
 ]
 
 [project.urls]
