@@ -6,7 +6,7 @@
 
 ## Overview
 
-`ha-state-archive` is a NAS-oriented archival and audit pipeline for Home Assistant.
+`ha-state-archive` is an archival and audit pipeline for Home Assistant environments.
 
 Unlike traditional backup approaches, the project treats Home Assistant configurations and runtime states as long-term technical assets requiring:
 
@@ -20,6 +20,67 @@ The project is designed for advanced Home Assistant environments where backups, 
 
 ---
 
+## Current modules
+
+### Release diff engine
+
+Generates:
+
+- detailed Markdown diffs;
+- statistical digests;
+- release indexes;
+- bounded and exclusion-aware reports.
+
+Features:
+
+- immutable release anchors;
+- idempotent processing;
+- SHA256 snapshot integrity;
+- exclusion filters for volatile runtime data;
+- bounded output safeguards.
+
+Documentation:
+
+- `docs/diff.md`
+
+---
+
+### Retention engine
+
+Classifies archived artifacts according to asymmetric retention policies.
+
+Features:
+
+- dry-run by default;
+- protected major releases;
+- critical artifact preservation;
+- quarantine-first workflow;
+- traceable Markdown reports.
+
+Documentation:
+
+- `docs/retention.md`
+
+---
+
+### Quarantine purge engine
+
+Safely deletes quarantined artifacts after a configurable grace period.
+
+Features:
+
+- strict quarantine root validation;
+- mandatory double-confirmation;
+- delayed destruction model;
+- dated quarantine targeting;
+- full purge traceability.
+
+Documentation:
+
+- `docs/purge.md`
+
+---
+
 ## Core principles
 
 - Immutable extracted versions
@@ -27,7 +88,7 @@ The project is designed for advanced Home Assistant environments where backups, 
 - Quarantine-before-purge retention
 - Separation between runtime and governance
 - Machine-readable supervision outputs
-- NAS-side processing and archival
+- Externalized archival workflows
 
 ---
 
@@ -35,7 +96,7 @@ The project is designed for advanced Home Assistant environments where backups, 
 
 Early public extraction from a production-grade private infrastructure.
 
-The repository is currently being cleaned, generalized and documented before broader public release.
+The repository is currently being generalized, cleaned and documented before broader public release.
 
 ---
 
