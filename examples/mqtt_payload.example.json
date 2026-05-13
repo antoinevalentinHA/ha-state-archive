@@ -1,0 +1,10 @@
+{
+  "contract_version": "1.0.0",
+  "engine_version": "0.1.0",
+  "published_at": "2026-01-01T00:00:00Z",
+  "audited_version": "2026-01-01_00-00_HomeAssistant",
+  "verdict": "ok",
+  "total_anomalies": 0,
+  "anomaly_categories": [],
+  "report_path": "/reports/latest.md"
+}
