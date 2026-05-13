@@ -1,0 +1,16 @@
+# ==========================================================
+# Home Assistant State Archive
+# Example quarantine purge policy
+# ==========================================================
+
+# Minimum number of days an artifact must remain
+# inside quarantine before permanent deletion
+quarantine_min_age_days: 30
+
+# Master safety switch for permanent deletion.
+# Even with this set to true, deletion still requires:
+#
+#   --apply
+#
+# on the CLI.
+allow_purge: false
