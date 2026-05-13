@@ -63,3 +63,4 @@ Thumbs.db
 
 # DEVELOPPEMENT
 test_mqtt.py
+*.egg-info/
