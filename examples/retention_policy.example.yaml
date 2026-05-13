@@ -1,0 +1,43 @@
+# ==========================================================
+# Home Assistant State Archive
+# Example retention policy
+# ==========================================================
+
+# Directory used to isolate quarantined artifacts
+quarantine_dir: "_quarantine"
+
+# Allow quarantine of old automatic backups
+quarantine_only_automatic_backups: true
+
+# Allow quarantine of generic retention candidates
+quarantine_candidate_delete: false
+
+# Logical prefixes preserved forever
+protected_name_prefixes:
+  - "Home Assistant v"
+  - "Release"
+
+# Critical artifacts preserved forever
+critical_name_patterns:
+  - "changelog"
+  - "contract"
+  - "architecture"
+
+# Automatic runtime backup prefixes
+automatic_backup_prefixes:
+  - "Automatic_backup"
+  - "Scheduled_backup"
+
+# Number of recent automatic backups preserved
+automatic_backup_keep_count: 10
+
+retention:
+
+  # Keep every artifact during this period
+  keep_all_days: 7
+
+  # Then keep one artifact per day
+  keep_daily_days: 30
+
+  # Then keep one artifact per week
+  keep_weekly_days: 180
