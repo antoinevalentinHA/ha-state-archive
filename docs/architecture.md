@@ -15,7 +15,7 @@ The project follows five core principles:
 1. Immutable extracted versions
 2. Strict separation of responsibilities
 3. NAS-side processing
-4. Machine-readable supervision
+4. Machine-readable observability
 5. Quarantine-before-purge retention
 
 The architecture is designed to minimize coupling between Home Assistant runtime operations and archival/audit responsibilities.
@@ -26,30 +26,30 @@ The architecture is designed to minimize coupling between Home Assistant runtime
 
 ```text
 Home Assistant Backup
-          ¦
-          ?
-    Ingestion Layer
-          ¦
-          ?
-   Stabilization Watcher
-          ¦
-          ?
-   Immutable Versions
-          ¦
-          +--------? Audit Engine
-          ¦               ¦
-          ¦               +--------? Markdown reports
-          ¦               +--------? MQTT verdicts
-          ¦
-          +--------? Diff Engine
-          ¦
-          +--------? Retention Engine
-                          ¦
-                          ?
-                    Quarantine
-                          ¦
-                          ?
-                        Purge
+        |
+        v
+ Ingestion Layer
+        |
+        v
+Stabilization Watcher
+        |
+        v
+ Immutable Versions
+        |
+        +-------> Audit Engine
+        |              |
+        |              +-------> Markdown reports
+        |              +-------> MQTT verdicts
+        |
+        +-------> Diff Engine
+        |
+        +-------> Retention Engine
+                       |
+                       v
+                 Quarantine
+                       |
+                       v
+                     Purge
 ```
 
 ---
@@ -84,9 +84,22 @@ The following elements are intentionally excluded from version control:
 - quarantine data;
 - generated reports;
 - secrets;
-- Home Assistant runtime databases;
+- Home Assistant runtime artifacts;
 - MQTT credentials;
 - production exports.
+
+---
+
+## Safety model
+
+The architecture intentionally separates:
+
+- retention from purge;
+- observation from destruction;
+- immutable archives from generated reports;
+- runtime systems from archival infrastructure.
+
+Destructive operations always require explicit confirmation layers.
 
 ---
 
