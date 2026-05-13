@@ -31,7 +31,9 @@ classifiers = [
     "Topic :: System :: Systems Administration"
 ]
 
-dependencies = []
+dependencies = [
+    "PyYAML>=6.0"
+]
 
 [project.urls]
 Homepage = "https://github.com/antoinevalentinHA/ha-state-archive"
