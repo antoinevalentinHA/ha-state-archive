@@ -60,3 +60,6 @@ home-assistant_v2.db*
 Thumbs.db
 .vscode/
 .idea/
+
+# DEVELOPPEMENT
+test_mqtt.py
