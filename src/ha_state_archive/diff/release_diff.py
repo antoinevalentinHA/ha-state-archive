@@ -23,6 +23,7 @@ import re
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -32,8 +33,20 @@ CAPTURE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(\d{2})-(\d{2})_")
 
 MAX_LINES_PER_FILE = 500
 MAX_DETAILED_FILES = 100
-MAX_OUTPUT_SIZE_BYTES = 5 * 1024 * 1024
+MAX_OUTPUT_SIZE_BYTES = 1 * 1024 * 1024
 DIFF_CONTEXT_LINES = 5
+
+EXCLUDE_PATTERNS = {
+    ".storage/",
+    "__pycache__/",
+    "*.log",
+    "*.db",
+    "*.db-shm",
+    "*.db-wal",
+    "home-assistant_v2.db",
+    "home-assistant_v2.db-shm",
+    "home-assistant_v2.db-wal",
+}
 
 
 @dataclass(frozen=True)
@@ -359,6 +372,24 @@ def extension_of(path: str) -> str:
     return suffix if suffix else "(no extension)"
 
 
+def is_excluded(path: str) -> bool:
+    normalized = path.replace("\\", "/")
+    parts = normalized.split("/")
+
+    for pattern in EXCLUDE_PATTERNS:
+        clean_pattern = pattern.rstrip("/")
+
+        # Directory-level exclusion anywhere in path
+        if clean_pattern in parts:
+            return True
+
+        # Filename-level exclusion
+        if fnmatch(parts[-1], clean_pattern):
+            return True
+
+    return False
+
+
 def compare_snapshots(left: Anchor, right: Anchor) -> Dict:
     old_index = index_snapshot(left.path)
     new_index = index_snapshot(right.path)
@@ -366,15 +397,26 @@ def compare_snapshots(left: Anchor, right: Anchor) -> Dict:
     old_keys = set(old_index)
     new_keys = set(new_index)
 
-    added = sorted(new_keys - old_keys)
-    deleted = sorted(old_keys - new_keys)
-    modified = sorted(
+    raw_added = sorted(new_keys - old_keys)
+    raw_deleted = sorted(old_keys - new_keys)
+    raw_modified = sorted(
         k
         for k in old_keys & new_keys
         if old_index[k].sha256 != new_index[k].sha256
         or old_index[k].size != new_index[k].size
     )
 
+    excluded = sorted({
+        p
+        for p in raw_added + raw_deleted + raw_modified
+        if is_excluded(p)
+    })
+    
+    excluded_set = set(excluded)
+    
+    added = [p for p in raw_added if p not in excluded_set]
+    deleted = [p for p in raw_deleted if p not in excluded_set]
+    modified = [p for p in raw_modified if p not in excluded_set]
     detailed_files = []
     additional_modified = []
     binary_modified = []
@@ -427,6 +469,7 @@ def compare_snapshots(left: Anchor, right: Anchor) -> Dict:
         "added": added,
         "deleted": deleted,
         "modified": modified,
+        "excluded": excluded,
         "detailed_files": detailed_files,
         "additional_modified": additional_modified,
         "binary_modified": binary_modified,
@@ -617,6 +660,21 @@ def build_digest_markdown(left: Anchor, right: Anchor, result: Dict) -> str:
     lines.append(f"- max Markdown size: {MAX_OUTPUT_SIZE_BYTES} bytes")
     lines.append(f"- truncated files: {len(result['truncated_files'])}")
     lines.append(f"- max output size reached: {result['output_size_truncated']}")
+    lines.append("")
+    lines.append("## Excluded from diff")
+    lines.append("")
+    
+    if result["excluded"]:
+        for p in result["excluded"][:50]:
+            lines.append(f"- `{p}`")
+    
+        if len(result["excluded"]) > 50:
+            lines.append(
+                f"- ... {len(result['excluded']) - 50} additional excluded entries"
+            )
+    else:
+        lines.append("- None.")
+    
     lines.append("")
     lines.append("## Note")
     lines.append("")
