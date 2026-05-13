@@ -16,7 +16,7 @@ Unlike traditional backup approaches, the project treats Home Assistant configur
 - controlled retention policies;
 - machine-readable audit verdicts.
 
-The project is designed primarily for advanced Home Assistant installations running on external infrastructure such as Synology NAS systems.
+The project is designed for advanced Home Assistant environments where backups, auditing and retention are handled outside Home Assistant itself.
 
 ---
 
