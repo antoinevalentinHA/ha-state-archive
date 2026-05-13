@@ -150,7 +150,7 @@ Stabilization Watcher
 | Diff engine | Available | Generate bounded Markdown diffs and digests |
 | Retention manager | Available | Classify archived artifacts and isolate eligible versions |
 | Quarantine purger | Available | Permanently delete expired quarantine folders safely |
-| MQTT supervision | Planned | Publish audit and pipeline verdicts to MQTT |
+| MQTT supervision | Available | Publish audit and pipeline verdicts to MQTT |
 
 ---
 
@@ -171,7 +171,7 @@ Stabilization Watcher
 
 The repository is an ongoing public extraction of a production-grade Home Assistant governance infrastructure.
 
-The codebase is currently being generalized and documented for broader public use.
+The codebase is progressively being generalized and documented for broader public use while preserving deterministic infrastructure-side behavior.
 
 ---
 
