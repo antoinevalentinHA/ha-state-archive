@@ -100,6 +100,30 @@ The repository is currently being generalized, cleaned and documented before bro
 
 ---
 
+## Available modules
+
+| Module | Status | Purpose |
+|---|---|---|
+| Diff engine | Available | Generate bounded Markdown diffs and digests between immutable versions |
+| Retention manager | Available | Classify archived artifacts and move eligible ones to quarantine |
+| Quarantine purger | Available | Permanently delete expired quarantine folders with double confirmation |
+| MQTT supervision | Planned | Publish audit and pipeline verdicts to MQTT |
+| Audit engine | Planned | Detect structural inconsistencies in Home Assistant archives |
+
+---
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Architectural invariants](docs/invariants.md)
+- [Diff engine](docs/diff.md)
+- [Retention engine](docs/retention.md)
+- [Quarantine purge engine](docs/purge.md)
+- [MQTT supervision](docs/mqtt.md)
+- [Synology DSM integration](docs/synology_dsm.md)
+
+---
+
 ## License
 
 GPL-3.0
