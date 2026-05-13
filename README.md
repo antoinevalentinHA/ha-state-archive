@@ -1,43 +1,59 @@
 # ha-state-archive
 
-> A structured archival system for Home Assistant focused on automated auditing, state versioning and configuration integrity.
+> Structured archival, audit and governance tooling for Home Assistant.
 
 ---
 
 ## Overview
 
-`ha-state-archive` is an archival and audit pipeline for Home Assistant environments.
+`ha-state-archive` is a governance-oriented archival pipeline for Home Assistant environments.
 
-Unlike traditional backup approaches, the project treats Home Assistant configurations and runtime states as long-term technical assets requiring:
+The project treats Home Assistant configurations and runtime states as long-term technical assets requiring:
 
 - immutable versioning;
-- structural integrity checks;
+- structural integrity auditing;
 - release-oriented diffs;
-- controlled retention policies;
-- machine-readable audit verdicts.
+- controlled retention workflows;
+- machine-readable supervision outputs.
 
-The project is designed for advanced Home Assistant environments where backups, auditing and retention are handled outside Home Assistant itself.
+Unlike traditional backup systems, the project focuses on reproducibility, observability and infrastructure-side governance.
 
 ---
 
-## Current modules
+## Main capabilities
+
+### Audit engine
+
+The audit engine analyzes extracted Home Assistant versions and detects structural inconsistencies without modifying archived data.
+
+Features include:
+
+- declaration extraction;
+- include graph resolution;
+- registry authority analysis;
+- static and dynamic reference extraction;
+- actionable anomaly classification;
+- architectural observations;
+- severity-based reporting;
+- machine-readable verdicts.
+
+Documentation:
+
+- `docs/audit.md`
+
+---
 
 ### Release diff engine
 
-Generates:
+Generates bounded Markdown diffs and statistical digests between immutable release anchors.
 
-- detailed Markdown diffs;
-- statistical digests;
-- release indexes;
-- bounded and exclusion-aware reports.
+Features include:
 
-Features:
-
-- immutable release anchors;
-- idempotent processing;
 - SHA256 snapshot integrity;
-- exclusion filters for volatile runtime data;
-- bounded output safeguards.
+- exclusion-aware diffs;
+- bounded outputs;
+- idempotent generation;
+- release indexing.
 
 Documentation:
 
@@ -47,15 +63,15 @@ Documentation:
 
 ### Retention engine
 
-Classifies archived artifacts according to asymmetric retention policies.
+Classifies archived artifacts according to deterministic retention policies.
 
-Features:
+Features include:
 
 - dry-run by default;
-- protected major releases;
-- critical artifact preservation;
 - quarantine-first workflow;
-- traceable Markdown reports.
+- protected release preservation;
+- traceable retention decisions;
+- asymmetric retention priority.
 
 Documentation:
 
@@ -65,15 +81,15 @@ Documentation:
 
 ### Quarantine purge engine
 
-Safely deletes quarantined artifacts after a configurable grace period.
+Safely destroys expired quarantine artifacts after a configurable grace period.
 
-Features:
+Features include:
 
-- strict quarantine root validation;
-- mandatory double-confirmation;
-- delayed destruction model;
-- dated quarantine targeting;
-- full purge traceability.
+- strict path validation;
+- quarantine-only scope;
+- delayed irreversible purge;
+- mandatory double confirmation;
+- full deletion traceability.
 
 Documentation:
 
@@ -84,19 +100,45 @@ Documentation:
 ## Core principles
 
 - Immutable extracted versions
-- Automated structural auditing
+- Observational-only auditing
 - Quarantine-before-purge retention
-- Separation between runtime and governance
-- Machine-readable supervision outputs
-- Externalized archival workflows
+- Runtime/governance separation
+- Machine-readable supervision
+- Infrastructure-side processing
+- Deterministic retention logic
+- Bounded human-readable outputs
 
 ---
 
-## Project status
+## Architecture
 
-Early public extraction from a production-grade private infrastructure.
-
-The repository is currently being generalized, cleaned and documented before broader public release.
+```text
+Home Assistant Backup
+        |
+        v
+ Ingestion Layer
+        |
+        v
+Stabilization Watcher
+        |
+        v
+ Immutable Versions
+        |
+        +-------> Audit Engine
+        |              |
+        |              +-------> Markdown reports
+        |              +-------> MQTT verdicts
+        |
+        +-------> Diff Engine
+        |
+        +-------> Retention Engine
+                       |
+                       v
+                 Quarantine
+                       |
+                       v
+                     Purge
+```
 
 ---
 
@@ -104,11 +146,11 @@ The repository is currently being generalized, cleaned and documented before bro
 
 | Module | Status | Purpose |
 |---|---|---|
-| Diff engine | Available | Generate bounded Markdown diffs and digests between immutable versions |
-| Retention manager | Available | Classify archived artifacts and move eligible ones to quarantine |
-| Quarantine purger | Available | Permanently delete expired quarantine folders with double confirmation |
+| Audit engine | Available | Detect structural inconsistencies in extracted Home Assistant versions |
+| Diff engine | Available | Generate bounded Markdown diffs and digests |
+| Retention manager | Available | Classify archived artifacts and isolate eligible versions |
+| Quarantine purger | Available | Permanently delete expired quarantine folders safely |
 | MQTT supervision | Planned | Publish audit and pipeline verdicts to MQTT |
-| Audit engine | Planned | Detect structural inconsistencies in Home Assistant archives |
 
 ---
 
@@ -116,11 +158,20 @@ The repository is currently being generalized, cleaned and documented before bro
 
 - [Architecture](docs/architecture.md)
 - [Architectural invariants](docs/invariants.md)
+- [Audit engine](docs/audit.md)
 - [Diff engine](docs/diff.md)
 - [Retention engine](docs/retention.md)
 - [Quarantine purge engine](docs/purge.md)
 - [MQTT supervision](docs/mqtt.md)
 - [Synology DSM integration](docs/synology_dsm.md)
+
+---
+
+## Project status
+
+The repository is an ongoing public extraction of a production-grade Home Assistant governance infrastructure.
+
+The codebase is currently being generalized and documented for broader public use.
 
 ---
 
