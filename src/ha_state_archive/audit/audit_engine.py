@@ -516,6 +516,54 @@ def _write_report(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
+def _write_verdict_json(
+    path: Path,
+    audit: AuditResult,
+    ha_root: Path,
+    executed_at: str,
+) -> None:
+    """Write a compact machine-readable verdict JSON for MQTT publication.
+
+    Schema is governed by the MQTT supervision contract (docs/mqtt.md).
+    Fields match the payload contract v1.0.0 required keys exactly.
+
+    The audited_version is derived from the ha_root directory name,
+    which follows the versioned directory naming convention of the ingestion
+    layer (e.g. 2026-01-01_00-00_HomeAssistant).
+    """
+    import json
+
+    p0_count = sum(1 for a in audit.anomalies if a.severity == "P0")
+    p1_count = sum(1 for a in audit.anomalies if a.severity == "P1")
+
+    if len(audit.anomalies) == 0:
+        verdict = "ok"
+    elif p0_count > 0:
+        verdict = "critical"
+    elif p1_count > 0:
+        verdict = "degraded"
+    else:
+        verdict = "degraded"
+
+    anomaly_categories = sorted({a.anomaly_type for a in audit.anomalies})
+
+    payload = {
+        "contract_version": "1.0.0",
+        "engine_version": __version__,
+        "published_at": executed_at,
+        "audited_version": ha_root.name,
+        "verdict": verdict,
+        "total_anomalies": len(audit.anomalies),
+        "anomaly_categories": anomaly_categories,
+        "report_path": None,
+    }
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(path)
+
+
 # ---------------------------------------------------------------------------
 # Markdown report generation
 # ---------------------------------------------------------------------------
@@ -688,16 +736,30 @@ if __name__ == "__main__":
         type=Path,
         help="Output path for the generated Markdown report.",
     )
+    parser.add_argument(
+        "--verdict-json",
+        required=False,
+        type=Path,
+        default=None,
+        help=(
+            "Optional output path for the compact verdict JSON file. "
+            "Used by the MQTT publication layer (publish_audit_mqtt.py). "
+            "If not provided, no verdict JSON is written."
+        ),
+    )
 
     args = parser.parse_args()
 
     ha_root: Path = args.ha_root.resolve()
     config_path: Path = args.config.resolve()
     report_path: Path = args.report.resolve()
+    verdict_json_path: Path | None = args.verdict_json.resolve() if args.verdict_json else None
 
     _validate_ha_root(ha_root)
     _validate_config(config_path)
     _validate_report_target(report_path)
+    if verdict_json_path is not None:
+        _validate_report_target(verdict_json_path)
 
     try:
         from ha_state_archive.audit.include_resolver import resolve_includes
@@ -734,6 +796,25 @@ if __name__ == "__main__":
             _write_report(report_path, report)
         except OSError as exc:
             _fail(f"Could not write report to {report_path}: {exc}", code=1)
+
+        if verdict_json_path is not None:
+            try:
+                _write_verdict_json(
+                    path=verdict_json_path,
+                    audit=audit,
+                    ha_root=ha_root,
+                    executed_at=executed_at,
+                )
+                # Backfill report_path into the verdict JSON now that we know it.
+                import json as _json
+                _vdata = _json.loads(verdict_json_path.read_text(encoding="utf-8"))
+                _vdata["report_path"] = str(report_path)
+                verdict_json_path.write_text(
+                    _json.dumps(_vdata, indent=2, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+            except OSError as exc:
+                _fail(f"Could not write verdict JSON to {verdict_json_path}: {exc}", code=1)
 
         # 0  = OK: no actionable anomalies detected.
         # 30 = ALERT: at least one actionable anomaly found (P0-P3).
