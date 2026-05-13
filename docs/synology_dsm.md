@@ -23,20 +23,20 @@ Typical execution flow:
 
 ```text
 Home Assistant backup
-        │
-        ▼
+        |
+        v
 Extraction task
-        │
-        ▼
+        |
+        v
 Watcher stabilization
-        │
-        ▼
+        |
+        v
 Audit / Diff generation
-        │
-        ▼
+        |
+        v
 Retention management
-        │
-        ▼
+        |
+        v
 MQTT publication
 ```
 
