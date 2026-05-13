@@ -20,11 +20,61 @@ Unlike traditional backup systems, the project focuses on reproducibility, obser
 
 ---
 
+## Architecture
+
+```text
+Home Assistant Backup
+        |
+        v
+ Ingestion Layer
+        |
+        v
+Stabilization Watcher
+        |
+        v
+ Immutable Versions
+        |
+        +-------> Audit Engine
+        |              |
+        |              +-------> Markdown reports
+        |              +-------> MQTT verdicts
+        |
+        +-------> Diff Engine
+        |
+        +-------> Retention Engine
+                       |
+                       v
+                 Quarantine
+                       |
+                       v
+                     Purge
+```
+
+---
+
 ## Main capabilities
+
+### Ingestion
+
+Decrypts and extracts encrypted Home Assistant backups into immutable versioned directories.
+
+Features include:
+
+- `hassio-tar` decryption support;
+- atomic extraction with staging directory;
+- SHA256-based state tracking;
+- partial extraction support for older backup structures;
+- dry-run mode.
+
+Documentation:
+
+- `docs/ingestion.md`
+
+---
 
 ### Audit engine
 
-The audit engine analyzes extracted Home Assistant versions and detects structural inconsistencies without modifying archived data.
+Analyzes extracted Home Assistant versions and detects structural inconsistencies without modifying archived data.
 
 Features include:
 
@@ -35,7 +85,7 @@ Features include:
 - actionable anomaly classification;
 - architectural observations;
 - severity-based reporting;
-- machine-readable verdicts.
+- machine-readable verdict JSON for MQTT publication.
 
 Documentation:
 
@@ -97,6 +147,23 @@ Documentation:
 
 ---
 
+### MQTT supervision
+
+Publishes compact audit verdicts to MQTT for external supervision.
+
+Features include:
+
+- stable payload contract;
+- strict freshness validation;
+- error payload on any failure;
+- credentials via environment variables or env file.
+
+Documentation:
+
+- `docs/mqtt.md`
+
+---
+
 ## Core principles
 
 - Immutable extracted versions
@@ -110,52 +177,41 @@ Documentation:
 
 ---
 
-## Architecture
-
-```text
-Home Assistant Backup
-        |
-        v
- Ingestion Layer
-        |
-        v
-Stabilization Watcher
-        |
-        v
- Immutable Versions
-        |
-        +-------> Audit Engine
-        |              |
-        |              +-------> Markdown reports
-        |              +-------> MQTT verdicts
-        |
-        +-------> Diff Engine
-        |
-        +-------> Retention Engine
-                       |
-                       v
-                 Quarantine
-                       |
-                       v
-                     Purge
-```
-
----
-
 ## Available modules
 
 | Module | Status | Purpose |
 |---|---|---|
+| Ingestion | Available | Decrypt and extract Home Assistant backups into versioned directories |
 | Audit engine | Available | Detect structural inconsistencies in extracted Home Assistant versions |
 | Diff engine | Available | Generate bounded Markdown diffs and digests |
 | Retention manager | Available | Classify archived artifacts and isolate eligible versions |
 | Quarantine purger | Available | Permanently delete expired quarantine folders safely |
-| MQTT supervision | Available | Publish audit and pipeline verdicts to MQTT |
+| MQTT supervision | Available | Publish audit verdicts to MQTT |
+
+---
+
+## Pipeline orchestration
+
+The full pipeline is orchestrated by `scripts/run_pipeline.sh`.
+
+Configuration is passed entirely via `HSA_*` environment variables.
+
+Required variables:
+
+| Variable | Description |
+|---|---|
+| `HSA_BACKUP_DIR` | Directory containing Home Assistant `.tar` backup files |
+| `HSA_AUDIT_CONFIG` | Path to the audit configuration YAML file |
+| `HSA_HASSIO_TAR` | Path to the `hassio-tar` binary |
+| `HASSIO_PASSWORD` | Backup decryption password |
+
+See `docs/synology_dsm.md` for the full variable reference and deployment guide.
 
 ---
 
 ## Documentation
 
+- [Ingestion](docs/ingestion.md)
 - [Architecture](docs/architecture.md)
 - [Architectural invariants](docs/invariants.md)
 - [Audit engine](docs/audit.md)
