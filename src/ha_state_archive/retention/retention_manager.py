@@ -37,11 +37,35 @@ def load_policy(policy_path: Path) -> dict:
 
 
 def extract_logical_name(name: str) -> str:
+    """Extract the logical label from a versioned directory name.
+
+    Expected format produced by the ingestion layer:
+        YYYY-MM-DD_HH-MM_<label>_<id>
+
+    Where:
+        parts[0] = date        (YYYY-MM-DD)
+        parts[1] = time        (HH-MM)
+        parts[2:-1] = label    (one or more segments)
+        parts[-1] = identifier (backup id or short hash)
+
+    A minimum of 5 underscore-separated parts is required to extract
+    a non-empty label. If the name does not conform to this structure,
+    the full name is returned unchanged and a warning is emitted.
+    This fallback preserves classification behaviour for non-standard
+    names at the cost of reduced accuracy.
+    """
     parts = name.split("_")
 
     if len(parts) >= 5:
         return "_".join(parts[2:-1])
 
+    import sys
+    print(
+        f"[retention_manager] WARNING: directory name does not match expected "
+        f"format YYYY-MM-DD_HH-MM_<label>_<id>: {name!r}. "
+        f"Falling back to full name for classification.",
+        file=sys.stderr,
+    )
     return name
 
 
