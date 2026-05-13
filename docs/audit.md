@@ -145,6 +145,48 @@ The primary observation type is:
 
 ---
 
+## Output artifacts
+
+### Markdown report
+
+A bounded human-readable report produced at the path provided via `--report`.
+
+Contains:
+
+- system metadata (engine version, execution date, target path);
+- global statistics;
+- severity summary;
+- anomaly type summary;
+- per-anomaly details with evidence and notes;
+- architectural observations.
+
+### Verdict JSON
+
+An optional compact machine-readable verdict file produced at the path provided via `--verdict-json`.
+
+Used by the MQTT publication layer. See `docs/mqtt.md` for the payload contract.
+
+Verdict values:
+
+| Verdict | Condition |
+|---|---|
+| `ok` | Zero actionable anomalies |
+| `critical` | At least one P0 anomaly |
+| `degraded` | Anomalies present, none at P0 |
+
+The verdict JSON includes:
+
+- `contract_version`
+- `engine_version`
+- `published_at`
+- `audited_version` (derived from the `--ha-root` directory name)
+- `verdict`
+- `total_anomalies`
+- `anomaly_categories`
+- `report_path`
+
+---
+
 ## Exit codes
 
 | Exit code | Meaning |
@@ -158,11 +200,21 @@ The primary observation type is:
 
 ## CLI usage
 
-```bash
-python -m ha_state_archive.audit.audit_engine \
-  --ha-root /path/to/extracted/homeassistant \
-  --config /path/to/audit_config.yaml \
-  --report /path/to/audit_report.md
+```sh
+python3 src/ha_state_archive/audit/audit_engine.py \
+  --ha-root /path/to/versions/2026-01-15_09-00_HomeAssistant \
+  --config  /path/to/config/audit_config.yaml \
+  --report  /path/to/reports/audit_2026-01-15.md
+```
+
+With verdict JSON for MQTT publication:
+
+```sh
+python3 src/ha_state_archive/audit/audit_engine.py \
+  --ha-root      /path/to/versions/2026-01-15_09-00_HomeAssistant \
+  --config       /path/to/config/audit_config.yaml \
+  --report       /path/to/reports/audit_2026-01-15.md \
+  --verdict-json /path/to/verdicts/latest.verdict.json
 ```
 
 ---
