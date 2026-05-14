@@ -1,0 +1,124 @@
+# ==========================================================
+# ha-state-archive — retention policy
+# ==========================================================
+#
+# This file configures the retention manager.
+#
+# Usage:
+#   python3 src/ha_state_archive/retention/retention_manager.py \
+#     --root    /path/to/versions   \
+#     --policy  config/retention_policy.yaml \
+#     --report  /path/to/report.md
+#
+# Add --apply to execute quarantine moves.
+# Without --apply, the script runs in strict dry-run mode.
+# ==========================================================
+
+
+# ---------------------------------------------------------------------------
+# Quarantine directory
+#
+# Directory used to isolate artifacts classified for removal.
+# Relative paths are resolved from --root.
+# ---------------------------------------------------------------------------
+
+quarantine_dir: "_quarantine"
+
+
+# ---------------------------------------------------------------------------
+# Quarantine blast radius
+#
+# quarantine_only_automatic_backups:
+#   When true, only artifacts classified as QUARANTINE_AUTOMATIC_OLD
+#   are eligible for quarantine moves.
+#   Recommended default: true.
+#
+# quarantine_candidate_delete:
+#   When true, artifacts classified as CANDIDATE_DELETE are also
+#   eligible for quarantine moves.
+#   Set to true only when the retention windows below have been
+#   validated against your archive.
+#   Default: false.
+# ---------------------------------------------------------------------------
+
+quarantine_only_automatic_backups: true
+quarantine_candidate_delete: false
+
+
+# ---------------------------------------------------------------------------
+# Protected artifacts — preserved indefinitely
+#
+# Artifacts whose logical name starts with one of these prefixes
+# are classified as KEEP_MAJOR and never quarantined.
+#
+# The logical name is extracted from the versioned directory name:
+#   YYYY-MM-DD_HH-MM_<logical_name>_<id>
+#
+# Example: "2026-01-15_09-00_Home_Assistant_v14_abc123"
+#   logical name -> "Home_Assistant_v14"
+#   normalized   -> "Home Assistant v14"
+# ---------------------------------------------------------------------------
+
+protected_name_prefixes:
+  - "Home Assistant v"
+  - "Release"
+
+
+# ---------------------------------------------------------------------------
+# Critical artifacts — preserved indefinitely
+#
+# Artifacts whose full name contains one of these patterns (case-insensitive)
+# are classified as KEEP_CRITICAL and never quarantined.
+# ---------------------------------------------------------------------------
+
+critical_name_patterns:
+  - "changelog"
+  - "contract"
+  - "architecture"
+
+
+# ---------------------------------------------------------------------------
+# Automatic backup identification
+#
+# Artifacts whose logical name starts with one of these prefixes
+# are treated as automatic runtime backups.
+#
+# The N most recent are preserved (see automatic_backup_keep_count).
+# Older ones are classified as QUARANTINE_AUTOMATIC_OLD.
+# ---------------------------------------------------------------------------
+
+automatic_backup_prefixes:
+  - "Automatic_backup"
+  - "Scheduled_backup"
+
+# Number of most recent automatic backups to preserve.
+automatic_backup_keep_count: 10
+
+
+# ---------------------------------------------------------------------------
+# Temporal retention windows
+#
+# Applied to artifacts not matched by the rules above.
+#
+# keep_all_days:
+#   Every artifact within this age is kept unconditionally (KEEP_RECENT).
+#
+# keep_daily_days:
+#   Beyond keep_all_days, one artifact per calendar day is kept (KEEP_DAILY).
+#
+# keep_weekly_days:
+#   Beyond keep_daily_days, one artifact per ISO week is kept (KEEP_WEEKLY).
+#
+# Beyond keep_weekly_days: CANDIDATE_DELETE.
+# ---------------------------------------------------------------------------
+
+retention:
+
+  # Keep every artifact during this period (days)
+  keep_all_days: 7
+
+  # Then keep one artifact per day (days from creation)
+  keep_daily_days: 30
+
+  # Then keep one artifact per week (days from creation)
+  keep_weekly_days: 180
