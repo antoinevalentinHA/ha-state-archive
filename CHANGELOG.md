@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.2.1] — 2026-05-14
+
+Coherence and documentation hardening patch.
+
+Corrects metadata and documentation inconsistencies identified after the `0.2.0` release.
+No functional changes to any runtime module.
+
+### Fixed
+
+- `pyproject.toml`: version aligned to `0.2.1` (was `0.2.0` while archive was already named `0.2.1`).
+- `config/retention_policy.example.yaml`: restored annotated content (file was empty in `0.2.0`).
+- `docs/mqtt.md`: audit verdict payload table updated to include `anomaly_categories` and `report_path` fields, consistent with the schema written by `audit_engine.py` and documented in `docs/audit.md`.
+- `examples/mqtt_payload.example.json`: `engine_version` updated from `0.1.0` to `1.1.1`, matching the current `audit_engine.py` release.
+
+### Documentation
+
+- `CHANGELOG.md`: added missing `docs/ingestion.md` entry under `[0.2.0]` Added section.
+
+---
+
 ## [0.2.0] — 2026-05-14
 
 Pipeline integrity release.
