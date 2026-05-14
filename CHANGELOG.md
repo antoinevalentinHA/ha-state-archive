@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.3.0] — 2026-05-14
+
+Contract test harness release.
+
+Adds pytest coverage for the four core modules. No functional changes to the pipeline or output contracts, except one bug fix surfaced by the new tests.
+
+### Added
+
+- Contract-level pytest coverage for retention classification, quarantine purge safety, release anchor detection, and MQTT verdict validation.
+- Tests covering 22 explicit contractual invariants across 4 modules (`retention_manager`, `quarantine_purger`, `release_diff`, `publish_audit_mqtt`).
+
+### Fixed
+
+- `mqtt/publish_audit_mqtt.py`: `read_verdict_json` now requires all 8 contract keys (`anomaly_categories` and `report_path` were missing from `_REQUIRED_VERDICT_KEYS`), matching the MQTT payload schema documented in `docs/mqtt.md` and corrected in `0.2.1`.
+
+---
+
 ## [0.2.2] — 2026-05-14
 
 Bug fix release.
