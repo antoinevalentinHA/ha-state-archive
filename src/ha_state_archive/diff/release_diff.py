@@ -13,6 +13,8 @@ Design goals:
 - persistent release state.
 """
 
+__version__ = "1.0.0"
+
 from __future__ import annotations
 
 import argparse
