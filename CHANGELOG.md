@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.2.2] — 2026-05-14
+
+Bug fix release.
+
+Corrects three defects identified during the `0.2.1` audit.
+No functional changes to the pipeline logic or output contracts.
+
+### Fixed
+
+- `diff/release_diff.py`: `__version__ = "1.0.0"` was positioned before `from __future__ import annotations`, causing a `SyntaxError` at import time. Moved after the full imports block.
+- `mqtt/publish_audit_mqtt.py`: `mqtt.Client()` instantiated without `CallbackAPIVersion`, deprecated in paho-mqtt 2.x. Replaced with `mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)`.
+- `retention/retention_manager.py`: report header emitted a hardcoded `Script version: 0.1.0` string. Replaced with a `__version__` module constant (`"1.0.0"`) referenced at report generation time.
+
+---
+
 ## [0.2.1] — 2026-05-14
 
 Coherence and documentation hardening patch.
