@@ -21,6 +21,8 @@ from pathlib import Path
 import yaml
 
 
+__version__ = "1.0.0"
+
 DECISION_KEEP_MAJOR = "KEEP_MAJOR"
 DECISION_KEEP_CRITICAL = "KEEP_CRITICAL"
 DECISION_KEEP_AUTOMATIC_RECENT = "KEEP_AUTOMATIC_RECENT"
@@ -319,7 +321,7 @@ def write_report(
         "# Retention report",
         "",
         f"- Generated at: `{now}`",
-        "- Script version: `0.1.0`",
+        f"- Script version: `{__version__}`",
         f"- Mode: `{mode_label}`",
         f"- Quarantine: `{quarantine_dir}`",
         f"- Quarantine only automatic backups: `{quarantine_only_automatic}`",
