@@ -1,6 +1,6 @@
 [project]
 name = "ha-state-archive"
-version = "0.2.2"
+version = "0.3.0"
 description = "A structured archival system for Home Assistant focused on automated auditing, state versioning and configuration integrity."
 readme = "README.md"
 requires-python = ">=3.11"
