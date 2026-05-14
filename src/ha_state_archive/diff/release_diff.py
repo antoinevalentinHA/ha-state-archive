@@ -13,8 +13,6 @@ Design goals:
 - persistent release state.
 """
 
-__version__ = "1.0.0"
-
 from __future__ import annotations
 
 import argparse
@@ -28,6 +26,8 @@ from datetime import datetime, timezone
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+__version__ = "1.0.0"
 
 
 ANCHOR_RE = re.compile(r"(^|_)v(\d+)(?:\.(\d+))?(_|$)")
