@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.2.2] — 2026-05-14
+
+Structural consistency patch — `diff/` module alignment.
+
+### Fixed
+
+- `src/ha_state_archive/diff/release_diff.py`: added `__version__ = "1.0.0"` constant, consistent with all other runtime modules.
+- `src/ha_state_archive/diff/__init__.py`: added missing package declaration.
+
+---
+
 ## [0.2.1] — 2026-05-14
 
 Coherence and documentation hardening patch.
