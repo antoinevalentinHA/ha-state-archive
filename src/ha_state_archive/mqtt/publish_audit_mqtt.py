@@ -119,6 +119,8 @@ _REQUIRED_VERDICT_KEYS = (
     "audited_version",
     "verdict",
     "total_anomalies",
+    "anomaly_categories",
+    "report_path",
 )
 
 
