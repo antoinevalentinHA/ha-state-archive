@@ -48,6 +48,7 @@ orchestration script was missing required arguments throughout.
   - No hardcoded paths. No side effects on the backup source directory.
 
 - `src/ha_state_archive/ingestion/__init__.py` — Package declaration.
+- `docs/ingestion.md` — Ingestion module reference documentation.
 
 ### Changed
 
