@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import argparse
+import sys
 from collections import Counter
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
@@ -701,11 +704,7 @@ def _render_report(
 # Main
 # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    import argparse
-    import sys
-    from datetime import datetime, timezone
-
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="audit_engine",
         description=(
@@ -748,7 +747,7 @@ if __name__ == "__main__":
         ),
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     ha_root: Path = args.ha_root.resolve()
     config_path: Path = args.config.resolve()
@@ -827,10 +826,14 @@ if __name__ == "__main__":
             f"{len(audit.observations)} architectural observation(s) — "
             f"report: {report_path}"
         )
-        sys.exit(exit_code)
+        return exit_code
 
     except SystemExit:
         raise
     except Exception as exc:
         print(f"INTERNAL ERROR: {type(exc).__name__}: {exc}", file=sys.stderr)
-        sys.exit(2)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
