@@ -20,6 +20,43 @@ Unlike traditional backup systems, the project focuses on reproducibility, obser
 
 ---
 
+## Getting started
+
+Before running any pipeline component, verify your environment:
+
+```bash
+python3 scripts/install_check.py --root /path/to/ha_backup_timeline
+```
+
+With MQTT verification:
+
+```bash
+python3 scripts/install_check.py \
+    --root /path/to/ha_backup_timeline \
+    --mqtt-env /path/to/ha_backup_timeline/config/mqtt.env
+```
+
+Exit codes: `0` ready, `1` ready with warnings, `2` environment not ready.
+
+The script requires no installation and has no dependencies beyond Python >= 3.11.
+
+### Expected directory structure
+
+```text
+ha_backup_timeline/
+├── versions/       # required — immutable extracted versions
+├── quarantine/     # required — isolated artifacts pending purge
+├── config/         # required — retention policy and credentials
+├── reports/        # recommended — audit and retention reports
+├── diffs/          # recommended — release diff outputs
+└── logs/           # recommended — pipeline execution logs
+```
+
+`required` directories are functionally blocking when absent.
+`recommended` directories are expected by pipeline components but do not prevent execution.
+
+---
+
 ## Architecture
 
 ```text
