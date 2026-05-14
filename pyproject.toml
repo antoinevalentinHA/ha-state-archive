@@ -1,6 +1,6 @@
 [project]
 name = "ha-state-archive"
-version = "0.6.0"
+version = "0.7.0"
 description = "A structured archival system for Home Assistant focused on automated auditing, state versioning and configuration integrity."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -43,6 +43,7 @@ ha-state-diff         = "ha_state_archive.diff.release_diff:main"
 ha-state-retention    = "ha_state_archive.retention.retention_manager:main"
 ha-state-purge        = "ha_state_archive.retention.quarantine_purger:main"
 ha-state-publish-mqtt = "ha_state_archive.mqtt.publish_audit_mqtt:main"
+ha-state-init         = "ha_state_archive.tools.init_project:main"
 
 [project.urls]
 Homepage = "https://github.com/antoinevalentinHA/ha-state-archive"
