@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.6.0] — 2026-05-14
+
+Continuous integration release.
+
+Adds GitHub Actions workflow running the 22 contractual invariants on every push and pull request.
+No changes to pipeline logic, contracts, or packaging.
+
+### Added
+
+- `.github/workflows/tests.yml`: CI workflow executing `pip install .` followed by `pytest` on `ubuntu-latest` / Python 3.11. Triggered on push and pull request.
+
+---
+
 ## [0.5.0] — 2026-05-14
 
 Packaging release.
