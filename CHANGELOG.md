@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.4.0] — 2026-05-14
+
+Environment verification release.
+
+Adds `scripts/install_check.py`, the first user-facing entry point into the project.
+No changes to pipeline modules or contracts.
+
+### Added
+
+- `scripts/install_check.py` — environment verifier. Checks Python version, root path, expected subdirectories, retention policy, optional MQTT credentials, package importability, and required system commands. stdlib only, no dependency on the package it verifies.
+- `README.md`: Getting started section with `install_check.py` usage and documented directory structure with `required` / `recommended` distinction.
+
+### Design
+
+- Exit codes: `0` (ready), `1` (ready with warnings), `2` (environment not ready).
+- `--root` required, explicit. `--mqtt-env` optional, explicit. No implicit path discovery.
+- `package not importable` → `WARN`, not `FAIL`. The verifier must run before installation.
+
+---
+
 ## [0.3.0] — 2026-05-14
 
 Contract test harness release.
