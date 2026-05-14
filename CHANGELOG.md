@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.5.0] — 2026-05-14
+
+Packaging release.
+
+Makes `ha-state-archive` installable as a proper Python package via `pip install .`.
+No changes to pipeline logic or contracts.
+
+### Added
+
+- `[project.scripts]` in `pyproject.toml`: six CLI entry points exposed after installation.
+  - `ha-state-extract` → `ha_state_archive.ingestion.extract:main`
+  - `ha-state-audit` → `ha_state_archive.audit.audit_engine:main`
+  - `ha-state-diff` → `ha_state_archive.diff.release_diff:main`
+  - `ha-state-retention` → `ha_state_archive.retention.retention_manager:main`
+  - `ha-state-purge` → `ha_state_archive.retention.quarantine_purger:main`
+  - `ha-state-publish-mqtt` → `ha_state_archive.mqtt.publish_audit_mqtt:main`
+
+### Changed
+
+- `audit/audit_engine.py`: CLI logic extracted from `if __name__ == "__main__"` block into a proper `main(argv=None) -> int` function. `if __name__` guard updated to `sys.exit(main())`. No change to audit logic.
+- `audit/audit_engine.py`: `argparse`, `sys`, `datetime`, `timezone` promoted to module-level imports.
+
+---
+
 ## [0.4.0] — 2026-05-14
 
 Environment verification release.
