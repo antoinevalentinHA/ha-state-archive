@@ -203,7 +203,7 @@ def mqtt_connect(config: dict):
         if rc == 0:
             connected.set()
 
-    client = mqtt.Client()
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
     client.on_connect = on_connect
     client.username_pw_set(config["username"], config["password"])
     client.connect(
