@@ -40,11 +40,13 @@ Example payload:
 ```json
 {
   "contract_version": "1.0.0",
-  "engine_version": "0.1.0",
+  "engine_version": "1.1.1",
   "published_at": "2026-01-01T00:00:00Z",
   "audited_version": "2026-01-01_00-00_HomeAssistant",
   "verdict": "ok",
-  "total_anomalies": 0
+  "total_anomalies": 0,
+  "anomaly_categories": [],
+  "report_path": "/path/to/reports/audit_2026-01-01_00-00-00.md"
 }
 ```
 
@@ -60,6 +62,8 @@ Example payload:
 | `audited_version` | string or null | Archived version audited |
 | `verdict` | string | Compact audit verdict |
 | `total_anomalies` | integer or null | Number of detected anomalies |
+| `anomaly_categories` | array or null | Anomaly types detected (empty array when verdict is `ok`) |
+| `report_path` | string or null | Absolute path to the generated Markdown report |
 
 ---
 
