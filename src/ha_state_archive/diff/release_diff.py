@@ -25,7 +25,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 __version__ = "1.0.0"
 
@@ -58,10 +57,10 @@ class Anchor:
     minor: int
     dirname: str
     path: Path
-    captured_at: Optional[datetime]
+    captured_at: datetime | None
 
     @property
-    def sort_key(self) -> Tuple[int, int]:
+    def sort_key(self) -> tuple[int, int]:
         return (self.major, self.minor)
 
 
@@ -115,8 +114,8 @@ def snapshot_sha256(snapshot_dir: Path) -> str:
     return h.hexdigest()
 
 
-def index_snapshot(snapshot_dir: Path) -> Dict[str, FileEntry]:
-    out: Dict[str, FileEntry] = {}
+def index_snapshot(snapshot_dir: Path) -> dict[str, FileEntry]:
+    out: dict[str, FileEntry] = {}
 
     files = sorted(
         [p for p in snapshot_dir.rglob("*") if p.is_file()],
@@ -133,7 +132,7 @@ def index_snapshot(snapshot_dir: Path) -> Dict[str, FileEntry]:
     return out
 
 
-def parse_capture_datetime(dirname: str) -> Optional[datetime]:
+def parse_capture_datetime(dirname: str) -> datetime | None:
     match = CAPTURE_RE.match(dirname)
 
     if not match:
@@ -147,7 +146,7 @@ def parse_capture_datetime(dirname: str) -> Optional[datetime]:
         return None
 
 
-def parse_anchor(path: Path) -> Optional[Anchor]:
+def parse_anchor(path: Path) -> Anchor | None:
     match = ANCHOR_RE.search(path.name)
 
     if not match:
@@ -167,14 +166,14 @@ def parse_anchor(path: Path) -> Optional[Anchor]:
     )
 
 
-def scan_anchors(versions_dir: Path) -> Tuple[List[Anchor], Dict[str, List[Anchor]]]:
+def scan_anchors(versions_dir: Path) -> tuple[list[Anchor], dict[str, list[Anchor]]]:
     if not versions_dir.exists():
         raise FileNotFoundError(f"versions directory does not exist: {versions_dir}")
 
     if not versions_dir.is_dir():
         raise NotADirectoryError(f"versions path is not a directory: {versions_dir}")
 
-    by_tag: Dict[str, List[Anchor]] = {}
+    by_tag: dict[str, list[Anchor]] = {}
 
     for p in versions_dir.iterdir():
         if not p.is_dir():
@@ -197,8 +196,8 @@ def scan_anchors(versions_dir: Path) -> Tuple[List[Anchor], Dict[str, List[Ancho
     return anchors, duplicates
 
 
-def detect_lineage_warnings(anchors: List[Anchor]) -> List[Tuple[Anchor, List[Anchor]]]:
-    warnings: List[Tuple[Anchor, List[Anchor]]] = []
+def detect_lineage_warnings(anchors: list[Anchor]) -> list[tuple[Anchor, list[Anchor]]]:
+    warnings: list[tuple[Anchor, list[Anchor]]] = []
 
     for i, anchor in enumerate(anchors):
         if anchor.captured_at is None:
@@ -216,15 +215,15 @@ def detect_lineage_warnings(anchors: List[Anchor]) -> List[Tuple[Anchor, List[An
     return warnings
 
 
-def consecutive_couples(anchors: List[Anchor]) -> List[Tuple[Anchor, Anchor]]:
+def consecutive_couples(anchors: list[Anchor]) -> list[tuple[Anchor, Anchor]]:
     return list(zip(anchors, anchors[1:]))
 
 
-def consecutive_tag_pairs(anchors: List[Anchor]) -> set[Tuple[str, str]]:
+def consecutive_tag_pairs(anchors: list[Anchor]) -> set[tuple[str, str]]:
     return {(a.tag, b.tag) for a, b in consecutive_couples(anchors)}
 
 
-def resolve_anchor(tag: str, anchors: List[Anchor]) -> Anchor:
+def resolve_anchor(tag: str, anchors: list[Anchor]) -> Anchor:
     by_tag = {a.tag: a for a in anchors}
 
     if tag not in by_tag:
@@ -234,9 +233,9 @@ def resolve_anchor(tag: str, anchors: List[Anchor]) -> Anchor:
 
 
 def selected_couples(
-    anchors: List[Anchor],
-    couple: Optional[List[str]],
-) -> List[Tuple[Anchor, Anchor]]:
+    anchors: list[Anchor],
+    couple: list[str] | None,
+) -> list[tuple[Anchor, Anchor]]:
     if couple is None:
         return consecutive_couples(anchors)
 
@@ -252,7 +251,7 @@ def selected_couples(
     return [(left, right)]
 
 
-def load_state(path: Path) -> Dict:
+def load_state(path: Path) -> dict:
     if not path.exists():
         return {
             "schema_version": 1,
@@ -272,11 +271,11 @@ def load_state(path: Path) -> Dict:
     return data
 
 
-def save_state(path: Path, data: Dict) -> None:
+def save_state(path: Path, data: dict) -> None:
     atomic_write_text(path, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
 
-def record_rejections(data: Dict, duplicates: Dict[str, List[Anchor]]) -> None:
+def record_rejections(data: dict, duplicates: dict[str, list[Anchor]]) -> None:
     data["rejected"] = []
     detected_at = now_iso()
 
@@ -292,8 +291,8 @@ def record_rejections(data: Dict, duplicates: Dict[str, List[Anchor]]) -> None:
 
 
 def record_lineage_warnings(
-    data: Dict,
-    warnings: List[Tuple[Anchor, List[Anchor]]],
+    data: dict,
+    warnings: list[tuple[Anchor, list[Anchor]]],
 ) -> None:
     data["lineage_warnings"] = []
     detected_at = now_iso()
@@ -313,7 +312,7 @@ def record_lineage_warnings(
         )
 
 
-def read_utf8(path: Path) -> Optional[str]:
+def read_utf8(path: Path) -> str | None:
     try:
         return path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -326,7 +325,7 @@ def unified_diff_for_file(
     rel: str,
     from_label: str,
     to_label: str,
-) -> Tuple[List[str], int, bool, bool]:
+) -> tuple[list[str], int, bool, bool]:
     old_text = read_utf8(old_path)
     new_text = read_utf8(new_path)
 
@@ -381,18 +380,16 @@ def is_excluded(path: str) -> bool:
     for pattern in EXCLUDE_PATTERNS:
         clean_pattern = pattern.rstrip("/")
 
-        # Directory-level exclusion anywhere in path
         if clean_pattern in parts:
             return True
 
-        # Filename-level exclusion
         if fnmatch(parts[-1], clean_pattern):
             return True
 
     return False
 
 
-def compare_snapshots(left: Anchor, right: Anchor) -> Dict:
+def compare_snapshots(left: Anchor, right: Anchor) -> dict:
     old_index = index_snapshot(left.path)
     new_index = index_snapshot(right.path)
 
@@ -413,9 +410,9 @@ def compare_snapshots(left: Anchor, right: Anchor) -> Dict:
         for p in raw_added + raw_deleted + raw_modified
         if is_excluded(p)
     })
-    
+
     excluded_set = set(excluded)
-    
+
     added = [p for p in raw_added if p not in excluded_set]
     deleted = [p for p in raw_deleted if p not in excluded_set]
     modified = [p for p in raw_modified if p not in excluded_set]
@@ -487,9 +484,9 @@ def build_diff_markdown(
     right: Anchor,
     from_hash: str,
     to_hash: str,
-    result: Dict,
+    result: dict,
 ) -> str:
-    lines: List[str] = []
+    lines: list[str] = []
 
     lines.append(f"# Release diff {left.tag} → {right.tag}")
     lines.append("")
@@ -597,11 +594,11 @@ def build_diff_markdown(
     return "\n".join(lines)
 
 
-def build_digest_markdown(left: Anchor, right: Anchor, result: Dict) -> str:
+def build_digest_markdown(left: Anchor, right: Anchor, result: dict) -> str:
     all_paths = result["added"] + result["deleted"] + result["modified"]
 
-    by_domain: Dict[str, int] = {}
-    by_ext: Dict[str, int] = {}
+    by_domain: dict[str, int] = {}
+    by_ext: dict[str, int] = {}
 
     for p in all_paths:
         by_domain[top_domain(p)] = by_domain.get(top_domain(p), 0) + 1
@@ -612,7 +609,7 @@ def build_digest_markdown(left: Anchor, right: Anchor, result: Dict) -> str:
         key=lambda x: (-x[1], x[0]),
     )[:10]
 
-    lines: List[str] = []
+    lines: list[str] = []
 
     lines.append(f"# Release digest {left.tag} → {right.tag}")
     lines.append("")
@@ -665,18 +662,18 @@ def build_digest_markdown(left: Anchor, right: Anchor, result: Dict) -> str:
     lines.append("")
     lines.append("## Excluded from diff")
     lines.append("")
-    
+
     if result["excluded"]:
         for p in result["excluded"][:50]:
             lines.append(f"- `{p}`")
-    
+
         if len(result["excluded"]) > 50:
             lines.append(
                 f"- ... {len(result['excluded']) - 50} additional excluded entries"
             )
     else:
         lines.append("- None.")
-    
+
     lines.append("")
     lines.append("## Note")
     lines.append("")
@@ -692,7 +689,7 @@ def produce_artifacts(
     releases_dir: Path,
     from_hash: str,
     to_hash: str,
-) -> Tuple[Path, Path]:
+) -> tuple[Path, Path]:
     result = compare_snapshots(left, right)
 
     diff_path = releases_dir / f"{left.tag}__to__{right.tag}.md"
@@ -710,7 +707,7 @@ def produce_artifacts(
     return diff_path, digest_path
 
 
-def find_existing_couple(data: Dict, left: Anchor, right: Anchor) -> Optional[Dict]:
+def find_existing_couple(data: dict, left: Anchor, right: Anchor) -> dict | None:
     for item in data["couples"]:
         if item.get("from") == left.tag and item.get("to") == right.tag:
             return item
@@ -726,13 +723,13 @@ def relative_to_or_absolute(path: Path, base: Path) -> str:
 
 
 def upsert_couple(
-    data: Dict,
+    data: dict,
     left: Anchor,
     right: Anchor,
     releases_dir: Path,
     state_root: Path,
     force: bool,
-    hash_cache: Dict[Path, str],
+    hash_cache: dict[Path, str],
 ) -> None:
     diff_path = releases_dir / f"{left.tag}__to__{right.tag}.md"
     digest_path = releases_dir / f"{left.tag}__to__{right.tag}__digest.md"
@@ -785,14 +782,14 @@ def upsert_couple(
         existing.update(record)
 
 
-def recompute_is_consecutive(data: Dict, anchors: List[Anchor]) -> None:
+def recompute_is_consecutive(data: dict, anchors: list[Anchor]) -> None:
     pairs = consecutive_tag_pairs(anchors)
 
     for item in data["couples"]:
         item["is_consecutive"] = (item.get("from"), item.get("to")) in pairs
 
 
-def version_key(tag: str) -> Tuple[int, int]:
+def version_key(tag: str) -> tuple[int, int]:
     match = re.match(r"^v(\d+)(?:\.(\d+))?$", tag)
 
     if not match:
@@ -801,7 +798,7 @@ def version_key(tag: str) -> Tuple[int, int]:
     return int(match.group(1)), int(match.group(2) or 0)
 
 
-def write_index(releases_dir: Path, data: Dict) -> None:
+def write_index(releases_dir: Path, data: dict) -> None:
     couples = list(data.get("couples", []))
     consecutive = [c for c in couples if c.get("is_consecutive") is True]
     non_consecutive = [c for c in couples if c.get("is_consecutive") is not True]
@@ -809,7 +806,7 @@ def write_index(releases_dir: Path, data: Dict) -> None:
     consecutive.sort(key=lambda c: version_key(c["to"]), reverse=True)
     non_consecutive.sort(key=lambda c: version_key(c["to"]), reverse=True)
 
-    lines: List[str] = []
+    lines: list[str] = []
 
     lines.append("# Release diffs")
     lines.append("")
@@ -855,10 +852,10 @@ def write_index(releases_dir: Path, data: Dict) -> None:
 
 
 def print_report(
-    anchors: List[Anchor],
-    duplicates: Dict[str, List[Anchor]],
-    lineage_warnings: List[Tuple[Anchor, List[Anchor]]],
-    couples: List[Tuple[Anchor, Anchor]],
+    anchors: list[Anchor],
+    duplicates: dict[str, list[Anchor]],
+    lineage_warnings: list[tuple[Anchor, list[Anchor]]],
+    couples: list[tuple[Anchor, Anchor]],
     dry_run: bool,
     force: bool,
 ) -> None:
@@ -910,7 +907,7 @@ def print_report(
     print("")
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Generate release diffs between versioned Home Assistant snapshots."
     )
@@ -989,7 +986,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         record_rejections(data, duplicates)
         record_lineage_warnings(data, lineage_warnings)
 
-        hash_cache: Dict[Path, str] = {}
+        hash_cache: dict[Path, str] = {}
 
         for left, right in couples:
             upsert_couple(
