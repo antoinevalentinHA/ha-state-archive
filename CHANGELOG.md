@@ -28,7 +28,7 @@ No changes to pipeline logic or contracts.
 ### Changed
 
 - `.github/workflows/tests.yml`: `actions/checkout` updated from `v4` to `v5`, `actions/setup-python` updated from `v5` to `v6`. Both actions now run on Node 24, resolving the Node 20 deprecation warning.
-- `pyproject.toml`: `ha-state-init` entry point added (`ha_state_archive.tools.init_project:main`).
+- `pyproject.toml`: version bumped to `0.7.0`. `ha-state-init` entry point added (`ha_state_archive.tools.init_project:main`).
 
 ---
 
