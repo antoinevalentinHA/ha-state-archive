@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.8.0] — 2026-05-15
+
+Code quality release.
+
+Corrects five defects identified during the v0.7.0 audit.
+No changes to pipeline logic or output contracts.
+
+### Fixed
+
+- `tools/init_project.py`: `_results` module-level mutable state replaced by a local `results` list passed explicitly to all operations. `main()` is now reentrant. Duplicated `_parse_with_argv` function removed — `_build_parser()` introduced as the single parser factory, used by `main(argv)` directly.
+- `retention/quarantine_purger.py`: validation error message corrected from `quarantine_min_age_days_must_be_positive_integer` to `quarantine_min_age_days_must_be_non_negative_integer`. The value `0` (immediate purge) was already accepted by the code; the message now reflects the actual contract.
+- `audit/audit_engine.py`: dead branch removed from `_write_verdict_json`. The `elif p1_count > 0` / `else` duplication is replaced by a single `else` branch with an explicit comment: all non-critical anomalies (P1, P2, P3) degrade the verdict to `degraded`.
+- `diff/release_diff.py`: legacy `typing` imports (`Dict`, `List`, `Optional`, `Tuple`) replaced by native Python 3.10+ annotations (`dict`, `list`, `str | None`, `tuple`). The `from typing import` line is removed entirely.
+- `pyproject.toml`: `pytest` added to `[project.optional-dependencies] dev`. `pip install .[dev]` now installs the test suite dependencies.
+
+---
+
 ## [0.7.0] — 2026-05-15
 
 CI maintenance and project initialization release.
