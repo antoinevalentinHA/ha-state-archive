@@ -28,8 +28,8 @@ def test_q1_allow_purge_missing_or_false_is_policy_error():
 
 
 def test_q2_min_age_negative_or_non_integer_is_policy_error():
-    assert "quarantine_min_age_days_must_be_positive_integer" in qp.validate_policy({"quarantine_min_age_days": -1, "allow_purge": True})
-    assert "quarantine_min_age_days_must_be_positive_integer" in qp.validate_policy({"quarantine_min_age_days": "7", "allow_purge": True})
+    assert "quarantine_min_age_days_must_be_non_negative_integer" in qp.validate_policy({"quarantine_min_age_days": -1, "allow_purge": True})
+    assert "quarantine_min_age_days_must_be_non_negative_integer" in qp.validate_policy({"quarantine_min_age_days": "7", "allow_purge": True})
 
 
 def test_q3_undated_folder_is_kept_and_not_planned_for_purge(tmp_path, monkeypatch):
