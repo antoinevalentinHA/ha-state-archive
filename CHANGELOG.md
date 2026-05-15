@@ -6,14 +6,29 @@ All notable changes to this project will be documented in this file.
 
 ## [0.7.0] — 2026-05-15
 
-CI maintenance release.
+CI maintenance and project initialization release.
 
 Updates GitHub Actions workflow to Node 24-based actions.
-No changes to pipeline logic, contracts, or packaging.
+Adds `ha-state-init`, the first user-facing setup command.
+Adds contract test harness covering all pipeline modules.
+No changes to pipeline logic or contracts.
+
+### Added
+
+- `scripts/init_project.py` (`ha-state-init`): conservative project initializer. Creates the expected directory structure under `--root` and generates a minimal `config/retention_policy.yaml` when absent. Dry-run by default — `--apply` required for any filesystem write. Never overwrites existing files or directories. Never deletes anything.
+- `src/ha_state_archive/tools/__init__.py`: new `tools` subpackage.
+- `src/ha_state_archive/tools/init_project.py`: installable module backing the `ha-state-init` CLI entry point.
+- `tests/conftest.py`: test configuration. Provides a paho-mqtt stub for environments where paho is not installed.
+- `tests/test_init_project_contract.py`: 6 contractual invariants (I1–I6) covering dry-run isolation, directory creation, retention policy generation, idempotence, no-overwrite, and `install_check` compatibility.
+- `tests/test_quarantine_purger_contract.py`: contract tests for `quarantine_purger`.
+- `tests/test_release_diff_contract.py`: contract tests for `release_diff`.
+- `tests/test_retention_manager_contract.py`: contract tests for `retention_manager`.
+- `tests/test_verdict_mqtt_contract.py`: contract tests for `publish_audit_mqtt`.
 
 ### Changed
 
 - `.github/workflows/tests.yml`: `actions/checkout` updated from `v4` to `v5`, `actions/setup-python` updated from `v5` to `v6`. Both actions now run on Node 24, resolving the Node 20 deprecation warning.
+- `pyproject.toml`: `ha-state-init` entry point added (`ha_state_archive.tools.init_project:main`).
 
 ---
 
