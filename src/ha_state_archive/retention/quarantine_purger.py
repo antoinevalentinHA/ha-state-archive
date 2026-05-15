@@ -21,7 +21,7 @@ from pathlib import Path
 
 import yaml
 
-VERSION = "0.1.0"
+__version__ = "0.1.0"
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ERROR_ALLOW_PURGE = "allow_purge_must_be_true_in_policy"
 
@@ -191,7 +191,7 @@ def render_report(
         "## Execution details",
         "",
         f"- **Timestamp**: {now}",
-        f"- **Module version**: {VERSION}",
+        f"- **Module version**: {__version__}",
         f"- **Mode**: {mode}",
         f"- **Quarantine directory**: `{quarantine_path}`",
         f"- **Min age days**: {policy.get('quarantine_min_age_days')}",
@@ -248,7 +248,7 @@ def write_report(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def main() -> None:
+def main() -> int:
     args = parse_args()
     quarantine_path = resolve_path(args.quarantine)
     policy_path = resolve_path(args.policy)
@@ -267,14 +267,14 @@ def main() -> None:
         rows = apply_purge(rows, quarantine_path, args.apply)
 
     content = render_report(quarantine_path, policy, rows, mode, policy_errors)
-    
+
     report_path = resolve_path(args.report)
     write_report(report_path, content)
 
     if policy_errors:
-        sys.exit(1)
-    sys.exit(0)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
