@@ -39,12 +39,12 @@ __version__ = "1.0.0"
 
 # (path_relative_to_root, required, description)
 DIRECTORIES: list[tuple[str, bool, str]] = [
-    ("versions",  True,  "immutable extracted versions"),
+    ("versions",   True,  "immutable extracted versions"),
     ("quarantine", True,  "artifacts isolated pending purge"),
-    ("config",    True,  "retention policy and credentials"),
-    ("reports",   False, "audit and retention reports"),
-    ("diffs",     False, "release diff outputs"),
-    ("logs",      False, "pipeline execution logs"),
+    ("config",     True,  "retention policy and credentials"),
+    ("reports",    False, "audit and retention reports"),
+    ("diffs",      False, "release diff outputs"),
+    ("logs",       False, "pipeline execution logs"),
 ]
 
 
@@ -140,74 +140,85 @@ retention:
 # Result model
 # ---------------------------------------------------------------------------
 
-CREATE  = "CREATE"
-SKIP    = "SKIP"
-DRYRUN  = "DRY-RUN"
-ERROR   = "ERROR"
-
-_results: list[tuple[str, str]] = []
+CREATE = "CREATE"
+SKIP   = "SKIP"
+DRYRUN = "DRY-RUN"
+ERROR  = "ERROR"
 
 
-def record(status: str, message: str) -> None:
-    _results.append((status, message))
+def _record(results: list[tuple[str, str]], status: str, message: str) -> None:
+    results.append((status, message))
     label = f"[{status}]"
     print(f"{label:<10} {message}")
 
 
-def created(message: str) -> None: record(CREATE, message)
-def skipped(message: str) -> None: record(SKIP,   message)
-def dryrun(message: str)  -> None: record(DRYRUN, message)
-def error(message: str)   -> None: record(ERROR,  message)
+def _created(results: list[tuple[str, str]], message: str) -> None:
+    _record(results, CREATE, message)
+
+
+def _skipped(results: list[tuple[str, str]], message: str) -> None:
+    _record(results, SKIP, message)
+
+
+def _dryrun(results: list[tuple[str, str]], message: str) -> None:
+    _record(results, DRYRUN, message)
+
+
+def _error(results: list[tuple[str, str]], message: str) -> None:
+    _record(results, ERROR, message)
 
 
 # ---------------------------------------------------------------------------
 # Operations
 # ---------------------------------------------------------------------------
 
-def ensure_directory(path: Path, apply: bool) -> None:
+def ensure_directory(path: Path, apply: bool, results: list[tuple[str, str]]) -> None:
     if path.exists():
         if path.is_dir():
-            skipped(f"directory already exists: {path}")
+            _skipped(results, f"directory already exists: {path}")
         else:
-            error(f"path exists but is not a directory: {path}")
+            _error(results, f"path exists but is not a directory: {path}")
         return
 
     if apply:
         try:
             path.mkdir(parents=True, exist_ok=True)
-            created(f"directory: {path}")
+            _created(results, f"directory: {path}")
         except OSError as exc:
-            error(f"could not create directory {path}: {exc}")
+            _error(results, f"could not create directory {path}: {exc}")
     else:
-        dryrun(f"would create directory: {path}")
+        _dryrun(results, f"would create directory: {path}")
 
 
-def ensure_retention_policy(config_dir: Path, apply: bool) -> None:
+def ensure_retention_policy(
+    config_dir: Path,
+    apply: bool,
+    results: list[tuple[str, str]],
+) -> None:
     path = config_dir / RETENTION_POLICY_FILENAME
 
     if path.exists():
-        skipped(f"retention policy already exists: {path}")
+        _skipped(results, f"retention policy already exists: {path}")
         return
 
     if apply:
         if not config_dir.exists():
-            # config/ was not created (error earlier) — skip silently
-            error(f"cannot write retention policy: config dir missing: {config_dir}")
+            _error(results, f"cannot write retention policy: config dir missing: {config_dir}")
             return
         try:
             path.write_text(RETENTION_POLICY_CONTENT, encoding="utf-8")
-            created(f"retention policy: {path}")
+            _created(results, f"retention policy: {path}")
         except OSError as exc:
-            error(f"could not write retention policy {path}: {exc}")
+            _error(results, f"could not write retention policy {path}: {exc}")
     else:
-        dryrun(f"would create retention policy: {path}")
+        _dryrun(results, f"would create retention policy: {path}")
 
 
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
-def parse_args() -> argparse.Namespace:
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ha-state-init",
         description=(
@@ -233,13 +244,15 @@ def parse_args() -> argparse.Namespace:
         default=False,
         help="Write changes to disk. Without this flag, runs in dry-run mode.",
     )
-    return parser.parse_args()
+    return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = parse_args() if argv is None else _parse_with_argv(argv)
+    args = _build_parser().parse_args(argv)
     root = Path(args.root).expanduser().resolve()
     apply: bool = args.apply
+
+    results: list[tuple[str, str]] = []
 
     mode = "APPLY" if apply else "DRY-RUN"
     print(f"ha-state-init {__version__} [{mode}]")
@@ -250,25 +263,22 @@ def main(argv: list[str] | None = None) -> int:
         print("No changes will be made. Pass --apply to write.")
         print()
 
-    # Create root if absent
-    ensure_directory(root, apply)
+    ensure_directory(root, apply, results)
 
-    # Create subdirectories
-    for rel_path, _required, description in DIRECTORIES:
-        ensure_directory(root / rel_path, apply)
+    for rel_path, _required, _description in DIRECTORIES:
+        ensure_directory(root / rel_path, apply, results)
 
-    # Create minimal retention policy
-    ensure_retention_policy(root / "config", apply)
+    ensure_retention_policy(root / "config", apply, results)
 
     print()
 
-    has_error = any(s == ERROR for s, _ in _results)
-    has_skip  = any(s == SKIP  for s, _ in _results)
+    has_error = any(s == ERROR  for s, _ in results)
+    has_skip  = any(s == SKIP   for s, _ in results)
 
-    creates  = sum(1 for s, _ in _results if s == CREATE)
-    skips    = sum(1 for s, _ in _results if s == SKIP)
-    dryruns  = sum(1 for s, _ in _results if s == DRYRUN)
-    errors   = sum(1 for s, _ in _results if s == ERROR)
+    creates = sum(1 for s, _ in results if s == CREATE)
+    skips   = sum(1 for s, _ in results if s == SKIP)
+    dryruns = sum(1 for s, _ in results if s == DRYRUN)
+    errors  = sum(1 for s, _ in results if s == ERROR)
 
     if apply:
         print(f"Results: {creates} created, {skips} skipped, {errors} errors")
@@ -293,14 +303,6 @@ def main(argv: list[str] | None = None) -> int:
         print("Pass --apply to write changes.")
 
     return 0
-
-
-def _parse_with_argv(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(prog="ha-state-init")
-    parser.add_argument("--version", action="version", version=f"ha-state-init {__version__}")
-    parser.add_argument("--root", required=True, metavar="PATH")
-    parser.add_argument("--apply", action="store_true", default=False)
-    return parser.parse_args(argv)
 
 
 if __name__ == "__main__":
