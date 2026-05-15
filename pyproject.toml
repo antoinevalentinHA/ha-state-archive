@@ -43,6 +43,7 @@ ha-state-diff         = "ha_state_archive.diff.release_diff:main"
 ha-state-retention    = "ha_state_archive.retention.retention_manager:main"
 ha-state-purge        = "ha_state_archive.retention.quarantine_purger:main"
 ha-state-publish-mqtt = "ha_state_archive.mqtt.publish_audit_mqtt:main"
+ha-state-init         = "ha_state_archive.tools.init_project:main"
 
 [project.urls]
 Homepage = "https://github.com/antoinevalentinHA/ha-state-archive"
