@@ -537,15 +537,13 @@ def _write_verdict_json(
     import json
 
     p0_count = sum(1 for a in audit.anomalies if a.severity == "P0")
-    p1_count = sum(1 for a in audit.anomalies if a.severity == "P1")
 
     if len(audit.anomalies) == 0:
         verdict = "ok"
     elif p0_count > 0:
         verdict = "critical"
-    elif p1_count > 0:
-        verdict = "degraded"
     else:
+        # P1, P2 or P3 anomalies present — all non-critical anomalies degrade the verdict.
         verdict = "degraded"
 
     anomaly_categories = sorted({a.anomaly_type for a in audit.anomalies})
