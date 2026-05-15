@@ -4,30 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [0.7.0] — 2026-05-14
+## [0.7.0] — 2026-05-15
 
-Project initialization release.
+CI maintenance release.
 
-Adds `ha-state-init`, the first user-facing setup command.
-No changes to pipeline logic or contracts.
+Updates GitHub Actions workflow to Node 24-based actions.
+No changes to pipeline logic, contracts, or packaging.
 
-### Added
+### Changed
 
-- `scripts/init_project.py` (`ha-state-init`): conservative project initializer. Creates the expected directory structure under `--root` and generates a minimal `config/retention_policy.yaml` when absent. Dry-run by default — `--apply` required for any filesystem write.
-- `src/ha_state_archive/tools/__init__.py`: new `tools` subpackage.
-- `tests/test_init_project_contract.py`: 6 contractual invariants (I1–I6) covering dry-run isolation, directory creation, retention policy generation, idempotence, no-overwrite, and `install_check` compatibility.
-
-### Safety
-
-- `ha-state-init` never overwrites existing files or directories.
-- `ha-state-init` never deletes anything.
-- Existing paths are skipped and reported explicitly (`[SKIP]`).
-- Exit `1` on partial apply (items already existed); exit `2` on fatal error only.
-
-### Design
-
-- After `ha-state-init --apply`, `install_check.py` reports at most `READY WITH WARNINGS` — never `FAIL`. Validated by I6.
-- Exit codes: `0` (done / dry-run complete), `1` (partial — items skipped), `2` (fatal error).
+- `.github/workflows/tests.yml`: `actions/checkout` updated from `v4` to `v5`, `actions/setup-python` updated from `v5` to `v6`. Both actions now run on Node 24, resolving the Node 20 deprecation warning.
 
 ---
 
