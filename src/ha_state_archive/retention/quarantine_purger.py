@@ -50,7 +50,7 @@ def validate_policy(policy: dict) -> list[str]:
     errors = []
     min_age = policy.get("quarantine_min_age_days")
     if not isinstance(min_age, int) or min_age < 0:
-        errors.append("quarantine_min_age_days_must_be_positive_integer")
+        errors.append("quarantine_min_age_days_must_be_non_negative_integer")
     if policy.get("allow_purge") is not True:
         errors.append(ERROR_ALLOW_PURGE)
     return errors
