@@ -36,6 +36,11 @@ dependencies = [
     "paho-mqtt>=2.1.0"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
 [project.scripts]
 ha-state-extract      = "ha_state_archive.ingestion.extract:main"
 ha-state-audit        = "ha_state_archive.audit.audit_engine:main"
