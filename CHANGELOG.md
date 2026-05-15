@@ -18,6 +18,7 @@ No changes to pipeline logic or output contracts.
 - `audit/audit_engine.py`: dead branch removed from `_write_verdict_json`. The `elif p1_count > 0` / `else` duplication is replaced by a single `else` branch with an explicit comment: all non-critical anomalies (P1, P2, P3) degrade the verdict to `degraded`.
 - `diff/release_diff.py`: legacy `typing` imports (`Dict`, `List`, `Optional`, `Tuple`) replaced by native Python 3.10+ annotations (`dict`, `list`, `str | None`, `tuple`). The `from typing import` line is removed entirely.
 - `pyproject.toml`: `pytest` added to `[project.optional-dependencies] dev`. `pip install .[dev]` now installs the test suite dependencies.
+- `tests/test_quarantine_purger_contract.py`: `test_q2` updated to match the corrected validation error message `quarantine_min_age_days_must_be_non_negative_integer`.
 
 ---
 
