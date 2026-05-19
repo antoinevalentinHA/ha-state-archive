@@ -262,9 +262,11 @@ See `docs/synology_dsm.md` for the full variable reference and deployment guide.
 
 ## Project status
 
-The repository is an ongoing public extraction of a production-grade Home Assistant governance infrastructure.
+`ha-state-archive` is extracted from a production Home Assistant environment where it has been running continuously.
 
-The codebase is progressively being generalized and documented for broader public use while preserving deterministic infrastructure-side behavior.
+All pipeline components are operational. The public release reflects the actual production codebase, not a simplified or demonstration variant.
+
+Generalization and documentation efforts are ongoing. Infrastructure-side behavior and contract invariants are not affected by them.
 
 ---
 
