@@ -1,6 +1,10 @@
 # ha-state-archive
 
-> Structured archival, audit and governance tooling for Home Assistant.
+[![GHCR](https://img.shields.io/badge/GHCR-container-blue)](https://github.com/antoinevalentinHA/ha-state-archive/pkgs/container/ha-state-archive)
+[![Tests](https://github.com/antoinevalentinHA/ha-state-archive/actions/workflows/tests.yml/badge.svg)](https://github.com/antoinevalentinHA/ha-state-archive/actions/workflows/tests.yml)
+[![Docker publish](https://github.com/antoinevalentinHA/ha-state-archive/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/antoinevalentinHA/ha-state-archive/actions/workflows/docker-publish.yml)
+
+> Structured infrastructure-side archival, audit and governance tooling for Home Assistant.
 
 ---
 
@@ -17,6 +21,33 @@ The project treats Home Assistant configurations and runtime states as long-term
 - machine-readable supervision outputs.
 
 Unlike traditional backup systems, the project focuses on reproducibility, observability and infrastructure-side governance.
+
+---
+
+## Official container image
+
+Official images are published through GitHub Container Registry (GHCR):
+
+```text
+ghcr.io/antoinevalentinha/ha-state-archive
+```
+
+Available tags include:
+
+- `latest`
+- versioned releases (`v0.8.1`, etc.)
+
+Quick verification:
+
+```bash
+docker run --rm \
+    ghcr.io/antoinevalentinha/ha-state-archive:latest \
+    ha-state-audit --help
+```
+
+The container image is intended for infrastructure-side execution on external systems such as NAS environments, dedicated archive servers or CI runners.
+
+It is not designed to run inside Home Assistant itself.
 
 ---
 
